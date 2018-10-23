@@ -1,0 +1,71 @@
+- name: Check delle precondizioni necessarie all'installazione
+  hosts: "*-cti*:*-acd*:*-ipt*:*-stc*:*-msa*"
+  gather_facts: true
+  any_errors_fatal: true
+
+  vars:
+   precondition_version1: "7.0.4-2"
+   precondition_version2: "7.0.4-2"
+   bug: 6565
+   logfile: /var/log/ansible_reitek.log
+   dir_rpms: /home/RPMS/CT_7.0.5-2
+   toinstall: /home/RPMS/toinstall
+
+  tasks:
+  # Precondizioni all'aggiornamento
+  - include: ../roles/6269/tasks/include/OS_supported.yml
+  - include: include/check_version.yml
+
+   # Conferma dell'aggiornamento e resoconto in file e Database
+  - block:
+    - name: Conferma la volontà di voler aggiornare
+      pause: prompt='Per favore conferma la volontà di aggiornare il Contact! Premi invio per proseguire. Premi Ctrl+c e poi "a" per interrompere'
+      run_once: true
+      when: ( AUTO is not defined or  ( AUTO is defined and AUTO != "true" )) and ansible_check_mode != true
+
+    - name: resoconto in file {{ logfile }}
+      shell: echo "Applicato il bug {{bug}} (UPGRADE_CONTACT) dall'utente $USER in data $(date +%d-%m-%Y_%H:%M:%S) sui server {{inventory_hostname}} " >> {{ logfile }}
+      changed_when: false
+
+    - name: resoconto in database ansible
+      shell: mysql --user=ansible_update --password=$(cat /home/password_insert) -e "insert into ansible.bugs values ( '{{bug}}','$USER','$(date +%d-%m-%Y_%H:%M:%S)','{{inventory_hostname}}');"
+      changed_when: false
+
+    delegate_to: localhost
+    delegate_facts: true
+    run_once: true
+
+  - name: stoppo il servizio crond
+    service: name=crond state=stopped
+
+  - set_fact:
+     contact_active: false
+     rasd_active: false
+     opensips_active: false
+     slapd_active: false
+     msa_active: false
+     sems_active: false
+     httpd_active: false
+
+
+# Verifica se Contact attivo
+# Verica se rasd è attivo
+# Verifica se opensips è attivo
+# Verifica se OPENLDAP è attivo
+# Verifica se MSA è attivo
+# Verifica se SEMS è attivo
+  - include: ../roles/6269/tasks/include/service_active_{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml
+  - include: ../roles/6269/tasks/include/stopper_{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml
+
+# Modifica la configurazione di opensips per distribuire il nuovo template e sistemare anche la parte di dialplan
+
+################################################################################
+
+  - name: Rimuovo tutti i .tar.gz nelle cartelle /opt/reitek/ct6/sbin e /opt/reitek/ct6/lib
+    shell: find /opt/reitek/ct6/sbin /opt/reitek/ct6/lib -type f -name "*.tar.gz" -exec rm -f {} \;
+  - name: Creo la cartella "{{ dir_rpms }}"
+    file: state=directory path={{ dir_rpms }}
+    check_mode: false
+
+  - include_vars: include/var_{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml
+    check_mode: false

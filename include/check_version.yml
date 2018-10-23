@@ -1,0 +1,21 @@
+- name: controllo se siamo alla versione di partenza {{ precondition_version }}
+  shell: rpm -qa | grep cth-system-{{ precondition_version1 }}
+  register: ver1
+  failed_when: false
+  changed_when: false
+  check_mode: false
+
+- name: controllo se siamo alla versione di partenza {{ precondition_version }}
+  shell: rpm -qa | grep cth-system-{{ precondition_version2 }}
+  register: ver2
+  failed_when: false
+  changed_when: false
+  check_mode: false
+
+# Se non sono nè alla versione 7.0.4-2 e nè alla versione 7.0.5-1 sto tentando di fare un aggiornamento che non ha senso
+- block:
+  - fail: msg="Non sei alla versione Contact {{ precondition_version }}.Non posso procedere."
+  - meta: end_play
+  when:
+  - ver1.rc != 0
+  - ver2.rc != 0

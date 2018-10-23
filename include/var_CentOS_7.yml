@@ -1,0 +1,4 @@
+src_rpms_contact: /mnt/qasr/ContaCT/Server/7.0.5/7.0.5-2/CENTOS7/*.rpm
+src_rpms_msa: /mnt/qasr/MSA/7.0/server/7.0.5/CENTOS7/*.rpm
+src_rpms_sems: /mnt/qasr/ContaCT/Server/common/CENTOS7/*.rpm
+src_rpms_ctmanagerws: /mnt/qasr/ContaCT/CTManagerWS/7.0.3/CENTOS7/*.rpm
