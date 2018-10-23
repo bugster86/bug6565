@@ -35,3 +35,4 @@ Informazioni Autore
 Martino.Viganò
 Martino.Vigano@enghouse.com
 
+![img](http://www.repstatic.it/content/localirep/img/rep-roma/2016/11/15/160350421-dd12488f-4153-46e8-a250-946eda1653e1.jpg)
