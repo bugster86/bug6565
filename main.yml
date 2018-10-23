@@ -69,3 +69,121 @@
 
   - include_vars: include/var_{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml
     check_mode: false
+
+  - name: Carico gli RPM  sulla macchina di riferimento (default CTI1)
+    copy:
+        dest: "{{ dir_rpms }}"
+        src: "{{ item }}"
+    check_mode: false
+    with_fileglob:
+        - "{{ src_rpms_contact }}"
+        - "{{ src_rpms_msa }}"
+        - "{{ src_rpms_sems }}"
+        - "{{ src_rpms_ctmanagerws }}"
+    when: inventory_hostname.split('-')[1].find(riferimento_cti1|default('cti1')) != -1
+
+  # Così ogni macchina ha a disposizione tutti gli ultimi RPM
+  - name: Copio gli RPM anche sulle altre macchine
+    shell: scp -pr -o StrictHostKeyChecking=no root@{{ inventory_hostname.split('-')[0] }}-{{riferimento_cti1|default('cti1')}}:{{ dir_rpms }}/*.rpm {{ dir_rpms }}/
+    check_mode: false
+    changed_when: false
+    when: inventory_hostname.split('-')[1].find(riferimento_cti1|default('cti1')) == -1
+
+  # Si crea una cartella che deve contenere solo quelli che devono essere realmente installati
+  - name: creo la cartella "{{ toinstall }}"
+    file: state=directory path={{ toinstall }}
+    check_mode: false
+
+  - shell: rm -fr "{{ toinstall }}"/*
+    check_mode: false
+    changed_when: false
+
+
+# Nella cartella to install vado a mettere solo gli RPM necessari
+  - include: ../roles/6269/tasks/include/rpm_toinstall.yml
+    check_mode: false
+    with_items:
+        - cth-opensips-
+        - cth-B2BUAEP-
+        - cth-B2BUAGW-
+        - cth-B2BUAVXML-
+        - cth-CTI-
+        - cth-HTTP2SIP-
+        - cth-hub-
+        - cth-ImportD-
+        - cth-ldapconfig-
+        - cth-libsSIP-
+        - cth-libs-
+        - cth-oracle-db-
+        - cth-overlay-x2x-
+        - cth-sems-
+        - cth-SipRP-
+        - cth-SIPSBC-
+        - cth-SM-
+        - cth-system-
+        - cth-X2XModules-
+        - cth-X2XSipEP-
+        - cth-CiscoBridge-
+        - cth-dbfrontend-
+        - cth-oracle11-system-
+        - cth-VXMLUA-
+        - cth-MSA-
+        - cth-CTManagerWS-
+  - name: TEST di installazione degli RPM
+    shell: "rpm -Uvh --test --force {{ toinstall }}/*.rpm "
+    changed_when: false
+    check_mode: false
+
+  - name: "INSTALLO GLI RPM !!!!"
+    shell: "rpm -Uvh --force {{ toinstall }}/*.rpm "
+
+  - name: Rimuovo vecchi binari installati manualmente
+    shell: find /opt/reitek/ct6/sbin /opt/reitek/ct6/lib/ -type f -regex ".*\.7\.0\.[234].*" -delete
+
+  - shell: updatedb
+
+  - include: ../roles/6269/tasks/include/schema_ldap.yml
+
+  - name: Rimozione cartella "{{ dir_rpms }}"
+    file: state=absent path={{ dir_rpms }}
+    check_mode: false
+  - name: Rimozione della cartella "{{ toinstall }}"
+    file: state=absent path={{ toinstall }}
+    check_mode: false
+
+
+- name: sistemo i link necessari per il funzionamento del prerouter
+  hosts: "*-cti*:*-acd*:*-ipt*:*-stc*"
+  gather_facts: true
+  any_errors_fatal: true
+
+  tasks:
+  - shell: ln -fs PreRouter prerouter ; chown -h reicom.contact prerouter
+    args:
+        chdir: /opt/reitek/ct6/sbin/
+    when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"
+
+  - shell: ln -fs PreRouter PreRouterMS ; chown -h reicom.contact PreRouterMS
+    args:
+        chdir: /opt/reitek/ct6/sbin/
+    when: ansible_distribution  == 'RedHat' and ansible_distribution_major_version == "6"
+
+  - pause: seconds=20
+    when: ansible_check_mode != true
+
+
+- name: Ripartenza del Contact
+  hosts: "*-cti*:*-acd*:*-ipt*:*-stc*:*-msa*"
+  gather_facts: true
+  any_errors_fatal: true
+
+  tasks:
+  - include: ../roles/6269/tasks/include/starter_{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml
+  - name: Avvio il servizio crond
+    service: name=crond state=started
+
+  - include: ../roles/6469/tasks/include/riavvia_servizi_pm2.yml
+    with_items:
+    - AgentDesktopSIO
+    - CTLdapWS
+    - CTView
