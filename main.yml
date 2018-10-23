@@ -24,7 +24,7 @@
       when: ( AUTO is not defined or  ( AUTO is defined and AUTO != "true" )) and ansible_check_mode != true
 
     - name: resoconto in file {{ logfile }}
-      shell: echo "Applicato il bug {{bug}} (UPGRADE_CONTACT) dall'utente $USER in data $(date +%d-%m-%Y_%H:%M:%S) sui server {{inventory_hostname}} " >> {{ logfile }}
+      shell: echo "Applicato il bug {{bug}} (UPGRADE_CONTACT 7.0.5-2) dall'utente $USER in data $(date +%d-%m-%Y_%H:%M:%S) sui server {{inventory_hostname}} " >> {{ logfile }}
       changed_when: false
 
     - name: resoconto in database ansible
