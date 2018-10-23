@@ -187,3 +187,25 @@
     - AgentDesktopSIO
     - CTLdapWS
     - CTView
+
+- name: Aggiornamento degli ultimi binari on top 7.0.5
+  hosts: "*-cti*:*-acd*:*-ipt*:*-stc*"
+  gather_facts: true
+  any_errors_fatal: true
+
+  tasks:
+  - service: name=crond state=stopped
+  - include_role:
+     name: '6164'
+    vars:
+     sorgente: '/mnt/qasr/ContaCT/Server/7.0.5/7.0.5-2/CENTOS7/binaries'
+     logfile: '/var/log/ansible_reitek.log'
+    when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"
+
+  - include_role:
+     name: '6164'
+    vars:
+     sorgente: '/mnt/qasr/ContaCT/Server/7.0.5/7.0.5-2/RHEL6.3/binaries'
+     logfile: '/var/log/ansible_reitek.log'
+    when: ansible_distribution  == 'RedHat' and ansible_distribution_major_version == "6"
+  - service: name=crond state=started
