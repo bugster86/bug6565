@@ -5,7 +5,7 @@
 
   vars:
    precondition_version1: "7.0.4-2"
-   precondition_version2: "7.0.4-2"
+   precondition_version2: "7.0.5-1"
    bug: 6565
    logfile: /var/log/ansible_reitek.log
    dir_rpms: /home/RPMS/CT_7.0.5-2

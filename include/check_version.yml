@@ -14,7 +14,7 @@
 
 # Se non sono nè alla versione 7.0.4-2 e nè alla versione 7.0.5-1 sto tentando di fare un aggiornamento che non ha senso
 - block:
-  - fail: msg="Non sei alla versione Contact {{ precondition_version }}.Non posso procedere."
+  - fail: msg="Non sei alla versione Contact {{ precondition_version1 }} e non sei nemmeno alla {{ precondition_version2 }}.Non posso procedere."
   - meta: end_play
   when:
   - ver1.rc != 0
