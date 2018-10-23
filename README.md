@@ -21,11 +21,13 @@ role 6269
 
 role 6469
 
+role 6551
+
 Esempio di chiamata
 ----------------
 
 ansible-playbook -l <gruppo host> /home/playbook/bugs/upgrade_CT_7042_7052/main.yml
-  
+
 oppure
 
 ansible-playbook -l <gruppo host> /home/playbook/bugs/upgrade_CT_7051_7052/main.yml

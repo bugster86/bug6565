@@ -17,6 +17,7 @@
   - include: include/check_version.yml
 
    # Conferma dell'aggiornamento e resoconto in file e Database
+  - include: include/check_bug_6551.yml
   - block:
     - name: Conferma la volontà di voler aggiornare
       pause: prompt='Per favore conferma la volontà di aggiornare il Contact! Premi invio per proseguire. Premi Ctrl+c e poi "a" per interrompere'

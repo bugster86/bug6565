@@ -1,0 +1,33 @@
+# L'aggiornamento del contact deve essere fatto solo dopo aver sistemato le cose su opensips con il bug 6551
+# ( con tutte le precendizioni che il bug 6551 richiede)
+
+- stat: path=/etc/opensips/opensips.cfg
+  register: opensips_cfg_6551_presente
+
+- shell: ps -ef | grep opensips  | grep -v grep
+  check_mode: false
+  failed_when: false
+  changed_when: false
+  register: opensips_attivo
+
+# questo grep lo eseguo solo per non fare la ricerca su eventuali opensips utilizzati per il natting
+- shell: grep CallRouter /etc/opensips/opensips.cfg
+  check_mode: false
+  failed_when: false
+  changed_when: false
+  register: opensips_prodotto
+
+- shell: grep "dialplan.so" /etc/opensips/opensips.cfg
+  check_mode: false
+  failed_when: false
+  changed_when: false
+  register: dialplan_ok
+
+- block:
+  - fail: msg="Non è stato applicato il bug 6551 prima di tentare l'UPGRADE_CONTACT. Non posso proseguire. il BUG 6551 è una precondizione all'aggiornamento"
+  - meta: end_play
+  when:
+  - opensips_cfg_6551_presente.stat.exists
+  - opensips_prodotto.rc == 0
+  - opensips_attivo.rc == 0
+  - dialplan_ok.rc != 0
