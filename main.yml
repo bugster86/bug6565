@@ -58,10 +58,6 @@
   - include: ../roles/6269/tasks/include/service_active_{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml
   - include: ../roles/6269/tasks/include/stopper_{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml
 
-# Modifica la configurazione di opensips per distribuire il nuovo template e sistemare anche la parte di dialplan
-
-################################################################################
-
   - name: Rimuovo tutti i .tar.gz nelle cartelle /opt/reitek/ct6/sbin e /opt/reitek/ct6/lib
     shell: find /opt/reitek/ct6/sbin /opt/reitek/ct6/lib -type f -name "*.tar.gz" -exec rm -f {} \;
   - name: Creo la cartella "{{ dir_rpms }}"
