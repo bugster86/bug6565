@@ -179,7 +179,7 @@
   - name: Avvio il servizio crond
     service: name=crond state=started
 
-  - include: ../6469/tasks/include/riavvia_servizi_pm2.yml
+  - include: ../6469/include/riavvia_servizi_pm2.yml
     with_items:
     - AgentDesktopSIO
     - CTLdapWS
