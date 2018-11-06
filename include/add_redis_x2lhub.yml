@@ -1,3 +1,6 @@
+- service: name=slapd state=started
+- pause: seconds=5
+
 - name: trovo il server ldap Master
   include: ../6520/roles/6520/tasks/trova_master.yml
 
