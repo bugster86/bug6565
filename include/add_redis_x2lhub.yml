@@ -1,10 +1,10 @@
 - name: trovo il server ldap Master
-  include: ../../6520/tasks/trova_master.yml
+  include: ../6520/roles/6520/tasks/trova_master.yml
 
 ## in uscita da questa include il server LDAP master è contenuto nel fact "ldap_master"
 - block:
   - name: Recupero i dati di ldap per l'inserimento
-    include: ../../6520/tasks/dati_inserimento_ldap.yml
+    include: ../6520/roles/6520/tasks//dati_inserimento_ldap.yml
    # In questo punto le variabili di uscita che ho sono le seguenti:
   # rootdn_6520
   # rootpw_6520
