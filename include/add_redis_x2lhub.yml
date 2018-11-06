@@ -14,7 +14,7 @@
   # rootdom_6520
   # roottld_6520
   - name: recupero l'elenco degli x2l-hub del sistema
-    shell: "slapcat -f /etc/openldap/slapd.conf | unldif | egrep 'dn: cn=[0-9]@x2l-hubtls'"
+    shell: "slapcat -f /etc/openldap/slapd.conf | unldif | egrep 'dn: cn=[0-9]@x2l-hubtls' | awk '{print $2}'"
     environment:
        PATH: "{{ ansible_env.PATH }}:/opt/reitek/ct6/bin"
     failed_when: false
