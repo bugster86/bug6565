@@ -32,7 +32,7 @@
       state: present
       server_uri: ldap://localhost/
       name: genericAttribute
-      values: "x2lRedisServers={{ hostvars['localhost']['ldap_master'] }} "
+      values: "x2lRedisServers={{ hostvars['localhost']['ldap_master'] }}"
       dn: "{{ item }}"
     with_items: "{{ x2lhub.stdout_lines }}"
 
