@@ -139,6 +139,9 @@
 
   - shell: updatedb
 
+
+  - include: include/trova_redis.yml
+  - include: include/add_redis_x2lhub.yml
   - include: ../roles/6269/tasks/include/schema_ldap.yml
 
   - name: Rimozione cartella "{{ dir_rpms }}"

@@ -1,0 +1,44 @@
+- name: trovo il server ldap Master
+  include: ../../6520/tasks/trova_master.yml
+
+## in uscita da questa include il server LDAP master è contenuto nel fact "ldap_master"
+- block:
+  - name: Recupero i dati di ldap per l'inserimento
+    include: ../../6520/tasks/dati_inserimento_ldap.yml
+   # In questo punto le variabili di uscita che ho sono le seguenti:
+  # rootdn_6520
+  # rootpw_6520
+  # rootdom_6520
+  # roottld_6520
+  - name: recupero l'elenco degli x2l-hub del sistema
+    shell: "slapcat -f /etc/openldap/slapd.conf | unldif | egrep 'dn: cn=[0-9]@x2l-hubtls'"
+    environment:
+       PATH: "{{ ansible_env.PATH }}:/opt/reitek/ct6/bin"
+    failed_when: false
+    changed_when: false
+    check_mode: false
+    register: x2lhub
+
+  - name: aggiungo la proprietà x2lRedisServers su ldap
+    ldap_attr:
+      bind_dn: "{{ rootdn_6520.stdout }}"
+      bind_pw: "{{ rootpw_6520.stdout }}"
+      state: present
+      server_uri: ldap://localhost/
+      name: x2lRedisServers
+      values: "{{ hostvars['localhost']['ldap_master'] }}"
+      dn: "{{ item }}"
+    with_items: "{{ x2lhub.stdout_lines }}"
+
+  - name: aggiungo la proprietà x2lEnableRedis su ldap
+    ldap_attr:
+      bind_dn: "{{ rootdn_6520.stdout }}"
+      bind_pw: "{{ rootpw_6520.stdout }}"
+      state: present
+      server_uri: ldap://localhost/
+      name: x2lEnableRedis
+      values: "TRUE"
+      dn: "{{ item }}"
+    with_items: "{{ x2lhub.stdout_lines }}"
+
+  when: inventory_hostname == hostvars['localhost']['ldap_master']

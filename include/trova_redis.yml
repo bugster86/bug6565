@@ -1,0 +1,14 @@
+- name: Controllo la presenza di redis
+  shell: ps -ef | grep redis  | grep -v grep
+  check_mode: false
+  failed_when: false
+  changed_when: false
+  register: redis_active
+
+- block:
+  - debug: msg="Il server con Redis è {{ inventory_hostname }}"
+  - set_fact:
+     redis_server: "{{ inventory_hostname }}"
+    delegate_to: localhost
+    delegate_facts: True
+  when: redis_active.rc == 0
