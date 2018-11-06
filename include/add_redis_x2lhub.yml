@@ -19,6 +19,9 @@
     check_mode: false
     register: x2lhub
 
+  - service: name=slapd state=started
+  - pause: seconds=5
+
   - name: aggiungo la proprietà x2lRedisServers su ldap
     ldap_attr:
       bind_dn: "{{ rootdn_6520.stdout }}"
@@ -40,5 +43,5 @@
       values: "TRUE"
       dn: "{{ item }}"
     with_items: "{{ x2lhub.stdout_lines }}"
-
+  - service: name=slapd state=stopped
   when: inventory_hostname == hostvars['localhost']['ldap_master']
