@@ -31,8 +31,8 @@
       bind_pw: "{{ rootpw_6520.stdout }}"
       state: present
       server_uri: ldap://localhost/
-      name: x2lRedisServers
-      values: "{{ hostvars['localhost']['ldap_master'] }}"
+      name: genericAttribute
+      values: "x2lRedisServers={{ hostvars['localhost']['ldap_master'] }} "
       dn: "{{ item }}"
     with_items: "{{ x2lhub.stdout_lines }}"
 
@@ -42,8 +42,8 @@
       bind_pw: "{{ rootpw_6520.stdout }}"
       state: present
       server_uri: ldap://localhost/
-      name: x2lEnableRedis
-      values: "TRUE"
+      name: genericAttribute
+      values: x2lEnableRedis=TRUE
       dn: "{{ item }}"
     with_items: "{{ x2lhub.stdout_lines }}"
   - service: name=slapd state=stopped
