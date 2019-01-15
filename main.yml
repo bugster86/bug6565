@@ -171,6 +171,35 @@
   - pause: seconds=20
     when: ansible_check_mode != true
 
+# Questo play viene fatto in base a quanto ricevuto nella mail di Ammollo il giorno 15/01/2018
+- name: Modifico Il file di configurazione di opensips per eliminare il prefisso INB nell'header TO
+  hosts: "*-cti1"
+  gather_facts: true
+  any_errors_fatal: true
+  
+  tasks:
+  - name: copio la nuova porzione di file opensips.cfg nella cartella /tmp/
+    copy:
+        src: files/opensips1.txt
+        dest: /tmp/
+  - shell: cat /tmp/opensips1.txt
+    check_mode: false
+    changed_when: false
+    register: r1
+    
+  - name: modifico il file di configurazione di opensips
+    blockinfile:
+      backup: true
+      dest: /etc/opensips/opensips.cfg
+      insertafter: 'prefix\("sipsbc"\);'
+      content: "{{ r1.stdout }}"
+      
+  - name: controllo sintassi opensips
+    shell: \opensips -c
+    changed_when: false    
+        
+  - name: elimino il file /tmp/opensips1.txt
+    file: dest=/tmp/opensips1.txt state=absent
 
 - name: Ripartenza del Contact
   hosts: "*-cti*:*-acd*:*-ipt*:*-stc*:*-msa*"

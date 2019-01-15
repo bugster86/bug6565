@@ -1,0 +1,16 @@
+      $var(prefix)="sip:INB";
+      if ($(hdr(To){s.index, $var(prefix)}) >=0)
+      {
+              xlog("L_NOTICE", "Strip INB prefix from To header");
+              # Strip the INB header from the To: header
+              $var(reg)="/sip:INB/sip:/";
+              $var(newto)=$(hdr(To){re.subst,$var(reg)});
+              # Strip any '<' at the beginning else uac_replace_to does not work
+              $var(reg)="/^<//";
+              $var(newto)=$(var(newto){re.subst,$var(reg)});
+              # Strip any '>' at the end else uac_replace_to does not work
+              $var(reg)="/>$//";
+              $var(newto)=$(var(newto){re.subst,$var(reg)});
+              uac_replace_to("$var(newto)");
+      }
+
