@@ -182,6 +182,7 @@
     copy:
         src: files/opensips1.txt
         dest: /tmp/
+    check_mode: false
   - shell: cat /tmp/opensips1.txt
     check_mode: false
     changed_when: false
