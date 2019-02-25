@@ -212,6 +212,9 @@
   - name: Avvio il servizio crond
     service: name=crond state=started
 
+  - name: Aggiorna applicazioni nodeJS
+    include: include/aggiorna_nodejs_apps.yml
+
   - include: ../6469/include/riavvia_servizi_pm2.yml
     with_items:
     - AgentDesktopSIO
