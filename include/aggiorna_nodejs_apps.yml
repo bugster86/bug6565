@@ -21,53 +21,66 @@
   run_once: true
 
 
-- name: copia l'ultima versione di AgentDesktopSIO
-  copy:
-      dest: /tmp/AgentDesktopSIO.tgz
-      src: "{{ last_agentdesktopsio.stdout }}"
-  check_mode: false
-
-- name: Scompatta l'ultima versione di AgentDesktopSIO
-  unarchive:
-        src: /tmp/AgentDesktopSIO.tgz
-        remote_src: true
-        extra_opts: "--strip-components=1"
-        dest: /opt/reitek/nodejs/AgentDesktopSIO/
-        owner: reicom
-        group: contact
-        mode: 0755
-
-- name: copia l'ultima versione di CTLdapWS
-  copy:
-      dest: /tmp/CTLdapWS.tgz
-      src: "{{ last_ctldapws.stdout }}"
-  check_mode: false
+- stat: path=/opt/reitek/nodejs/AgentDesktopSIO/
+  register: ADSIO_path
+- stat: path=/opt/reitek/nodejs/CTLdapWS/
+  register: CTLDAPWS_path
+- stat: path=/opt/reitek/nodejs/CTView/
+  register: CTVIEW_path
   
-- name: Scompatta l'ultima versione di CTLdapWS
-  unarchive:
-    src: /tmp/CTLdapWS.tgz
-    remote_src: true
-    extra_opts: "--strip-components=1"
-    dest: /opt/reitek/nodejs/CTLdapWS/
-    owner: reicom
-    group: contact
-    mode: 0755
+- block:
+  - name: copia l'ultima versione di AgentDesktopSIO
+    copy:
+        dest: /tmp/AgentDesktopSIO.tgz
+        src: "{{ last_agentdesktopsio.stdout }}"
+    check_mode: false
 
-- name: copia l'ultima versione di CTView
-  copy:
-      dest: /tmp/CTView.tgz
-      src: "{{ last_ctview.stdout }}"
-  check_mode: false
+  - name: Scompatta l'ultima versione di AgentDesktopSIO
+    unarchive:
+          src: /tmp/AgentDesktopSIO.tgz
+          remote_src: true
+          extra_opts: "--strip-components=1"
+          dest: /opt/reitek/nodejs/AgentDesktopSIO/
+          owner: reicom
+          group: contact
+          mode: 0755
+  when: ADSIO_path.stat.exists      
 
-- name: Posiziona l'ultima versione di CTView
-  unarchive:
-      src: /tmp/CTView.tgz
+- block:
+  - name: copia l'ultima versione di CTLdapWS
+    copy:
+        dest: /tmp/CTLdapWS.tgz
+        src: "{{ last_ctldapws.stdout }}"
+    check_mode: false
+    
+  - name: Scompatta l'ultima versione di CTLdapWS
+    unarchive:
+      src: /tmp/CTLdapWS.tgz
       remote_src: true
       extra_opts: "--strip-components=1"
-      dest: /opt/reitek/nodejs/CTView/
+      dest: /opt/reitek/nodejs/CTLdapWS/
       owner: reicom
       group: contact
       mode: 0755
+  when: CTLDAPWS_path.stat.exists
+
+- block:
+  - name: copia l'ultima versione di CTView
+    copy:
+        dest: /tmp/CTView.tgz
+        src: "{{ last_ctview.stdout }}"
+    check_mode: false
+
+  - name: Posiziona l'ultima versione di CTView
+    unarchive:
+        src: /tmp/CTView.tgz
+        remote_src: true
+        extra_opts: "--strip-components=1"
+        dest: /opt/reitek/nodejs/CTView/
+        owner: reicom
+        group: contact
+        mode: 0755
+  when: CTVIEW_path.stat.exists
       
 - name: Elimino i file da /tmp
   file:
