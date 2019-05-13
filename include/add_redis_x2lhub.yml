@@ -1,4 +1,5 @@
 - service: name=slapd state=started
+  when: slapd_active
 - pause: seconds=5
 
 - name: trovo il server ldap Master
