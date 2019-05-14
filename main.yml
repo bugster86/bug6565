@@ -131,6 +131,11 @@
     changed_when: false
     check_mode: false
 
+  - name: Controllo che tutti i processi che ho stoppato siano veramente morti
+    include: include/check_killed.yml
+    when: not ansible_check_mode
+
+
   - name: "INSTALLO GLI RPM !!!!"
     shell: "rpm -Uvh --force {{ toinstall }}/*.rpm "
 

@@ -1,0 +1,36 @@
+- name: Mi assicuro che sia presente l'ultima versione di pst (useremo quella per fare i controlli)
+  copy:
+        backup: true
+        src: ../files/lastpst
+        dest: /usr/bin/pst
+        owner: root
+        group: root
+        mode: 0755
+
+- name: Controllo lo stato di Contact
+  include: check_pst.yml regexp=/opt/reitek/ct6/sbin
+  when: contact_active
+
+- name: Controllo lo stato di rasd
+  include: check_pst.yml regexp=rasd
+  when: rasd_active
+
+- name: Controllo lo stato di opensips
+  include: check_pst.yml regexp=opensips
+  when: opensips_active
+
+- name: Controllo lo stato di slapd
+  include: check_pst.yml regexp=slapd
+  when: slapd_active
+
+- name: Controllo lo stato di MSA
+  include: check_pst.yml regexp=msa
+  when: msa_active
+
+- name: Controllo lo stato di SEMS
+  include: check_pst.yml regexp=sems
+  when: sems_active
+
+- name: Controllo lo stato di HTTPD
+  include: check_pst.yml regexp=httpd
+  when: httpd_active

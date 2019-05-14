@@ -1,0 +1,14 @@
+- shell: pst {{ regexp }}
+  changed_when: false
+  failed_when: false
+  register: pstout
+
+#Se il valore di uscita del mio pst è 0 vuol dire che ho trovato ancora qualcosa di attivo che invece dovrebbe essere morto
+- block:
+  - debug: 
+     msg: "Ci sono dei processi che non sono correttamente stoppati. Procedi al kill manuale"
+  - debug: 
+     msg: "{{ pstout.stdout_lines }}"
+  - pause: 
+     prompt: "Killa i processi sul server {{ inventory_hostname }} e premi invio"
+  when: pstout.rc == 0
