@@ -1,0 +1,3 @@
+#!/bin/sh
+exec /usr/bin/mono $MONO_OPTIONS "/usr/lib/mono/4.0/mod-mono-server4.exe" "$@"
+
