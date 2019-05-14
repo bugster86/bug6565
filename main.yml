@@ -134,6 +134,11 @@
   - name: "INSTALLO GLI RPM !!!!"
     shell: "rpm -Uvh --force {{ toinstall }}/*.rpm "
 
+  - name: Verifico se stiamo usando la corretta versione di mod_mono_server
+    include: include/check_mono_server.yml
+    when: httpd_active
+
+
   - name: Rimuovo vecchi binari installati manualmente
     shell: find /opt/reitek/ct6/sbin /opt/reitek/ct6/lib/ -type f -regex ".*\.7\.0\.[234].*" -delete
 

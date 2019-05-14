@@ -1,0 +1,54 @@
+- name: Verifico la presenza del file di configurazione /etc/httpd/conf.d/mod_mono.conf
+  stat: path=/etc/httpd/conf.d/mod_mono.conf
+  register: mono_httpd_conf
+
+- name: Verifico la presenza del file /usr/bin/mod-mono-server
+  stat: path=/usr/bin/mod-mono-server
+  register: mono_server
+
+- block:
+  - name: Mi accerto che la direttiva KeepAlive Off sia presente all'interno del file /etc/httpd/conf.d/mod_mono.conf
+    lineinfile:
+          dest: /etc/httpd/conf.d/mod_mono.conf
+          backup: true
+          line: 'KeepAlive Off'
+          insertafter: 'MonoServerPath'
+
+  - name: Cerco la direttiva Header all'interno del file /etc/httpd/conf.d/mod_mono.conf
+    shell: "grep #Header /etc/httpd/conf.d/mod_mono.conf"
+    check_mode: false
+    changed_when: false
+    failed_when: false
+    register: header
+
+  - name: Comment la direttiva dell'header mono
+    replace:
+        backup: true
+        dest: /etc/httpd/conf.d/mod_mono.conf
+        regexp: 'Header'
+        replace: '#Header'
+    when: header.rc != 0
+
+  - name: Cerco la voce mod-mono-server4 all'interno del file /usr/bin/mod-mono-server
+    shell: grep mod-mono-server4 /usr/bin/mod-mono-server
+    check_mode: false
+    changed_when: false
+    failed_when: false
+    register: server4
+
+
+  - name: Copio il file /usr/bin/mod-mono-server adatto
+    copy:
+        backup: true
+        dest: /usr/bin/mod-mono-server
+        owner: root
+        group: root
+        mode: 0755
+        src: "../files/modmono_{{ ansible_distribution }}{{ ansible_distribution_major_version  }} "
+    when: server4.rc != 0
+
+
+  when:
+  - mono_httpd_conf.stat.exists
+  - mono_server.stat.exists
+
