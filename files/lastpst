@@ -1,0 +1,15 @@
+#!/bin/sh
+
+if [ $# -lt 1 ]
+then
+        echo "Usage: pst <string>"
+        exit 1
+fi
+
+echo "    USER   PID  PPID PCPU       ETIME  CPUTIME COMM"
+for i in $*
+do
+        ps -w -ea -ouser -opid -oppid -opcpu -oetime -otime -oargs | grep -i $i | grep -v grep | grep -v pst
+done
+
+
