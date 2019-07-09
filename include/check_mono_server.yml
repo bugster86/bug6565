@@ -44,7 +44,7 @@
         owner: root
         group: root
         mode: 0755
-        src: "../files/modmono_{{ ansible_distribution }}{{ ansible_distribution_major_version  }} "
+        src: "../files/modmono_{{ ansible_distribution }}{{ ansible_distribution_major_version }}"
     when: server4.rc != 0
 
 
