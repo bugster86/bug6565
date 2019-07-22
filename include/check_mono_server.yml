@@ -7,6 +7,14 @@
   register: mono_server
 
 - block:
+  - name: Mi accerto che nel file /etc/httpd/conf.d/mod_mono.conf sia presente MonoServerPath /usr/bin/mod-mono-server
+    lineinfile:
+         dest: /etc/httpd/conf.d/mod_mono.conf
+         backup: true
+         line: 'MonoServerPath /usr/bin/mod-mono-server'
+         insertbefore: BOF
+
+
   - name: Mi accerto che la direttiva KeepAlive Off sia presente all'interno del file /etc/httpd/conf.d/mod_mono.conf
     lineinfile:
           dest: /etc/httpd/conf.d/mod_mono.conf
